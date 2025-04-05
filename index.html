@@ -1,22 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>凌霄的小游戏</title>
+    <title>凌霄的猜数字游戏</title>
     <style>
-        /* 全局样式保持不变 */
+        /* 全局样式 */
         body {
             margin: 0;
             padding: 0;
             height: 100vh;
             font-family: 'Microsoft YaHei', sans-serif;
+            
+            /* 背景图设置（已修复链接） */
             background-image: url('http://img.52desk.com/tp/211924PrUvQ.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            
+            /* 深色半透明遮罩（确保文字可读） */
             position: relative;
-            overflow: hidden; /* 新增：防止爱心溢出滚动条 */
+            overflow: hidden;
         }
-        /* 其他原有样式保持不变... */
+        
+        body::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+        
+        /* 欢迎语样式 */
+        #welcome-text {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            z-index: 2;
+            font-weight: bold;
+        }
+
+        /* 游戏弹窗样式 */
+        #game-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            z-index: 3;
+            width: 300px;
+            text-align: center;
+        }
+
+        #game-popup h2 {
+            color: #ff6b6b;
+            margin-top: 0;
+        }
+
+        #guess-input {
+            padding: 8px;
+            width: 100px;
+            margin: 10px 0;
+        }
+
+        #guess-button {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin: 15px 0;
+            font-weight: bold;
+            min-height: 20px;
+        }
+
+        #restart-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            margin-top: 10px;
+        }
 
         /* 新增爱心特效样式 */
         .heart {
@@ -41,10 +119,30 @@
     </style>
 </head>
 <body>
-    <!-- 原有内容保持不变... -->
+    <!-- 左上角欢迎语 -->
+    <div id="welcome-text">凌霄，欢迎你的加入！</div>
+
+    <!-- 猜数字游戏 -->
+    <div id="game-popup">
+        <h2>猜数字小游戏</h2>
+        <p>我已经想好了一个1-100之间的数字，猜猜看是多少？</p>
+        <input type="number" id="guess-input" min="1" max="100" placeholder="输入1-100">
+        <button id="guess-button">猜一猜</button>
+        <div id="result"></div>
+        <button id="restart-button">再玩一次</button>
+    </div>
 
     <script>
-        // 原有游戏逻辑保持不变...
+        // 游戏逻辑
+        let targetNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+        const maxAttempts = 7;
+
+        document.getElementById('guess-button').addEventListener('click', checkGuess);
+        document.getElementById('restart-button').addEventListener('click', restartGame);
+        document.getElementById('guess-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkGuess();
+        });
 
         function checkGuess() {
             const guess = parseInt(document.getElementById('guess-input').value);
@@ -61,12 +159,35 @@
             if (guess === targetNumber) {
                 resultDiv.innerHTML = `🎉 恭喜你！用了 ${attempts} 次猜中了数字 ${targetNumber}！`;
                 resultDiv.style.color = "green";
-                createHearts(); // 新增：触发爱心特效
+                createHearts(); // 触发爱心特效
                 endGame();
             } else if (attempts >= maxAttempts) {
-                // ...原有失败逻辑
+                resultDiv.innerHTML = `😢 游戏结束！正确答案是 ${targetNumber}`;
+                resultDiv.style.color = "red";
+                endGame();
+            } else {
+                const hint = guess < targetNumber ? "太小了" : "太大了";
+                resultDiv.textContent = `❌ 不对哦！${hint}（还剩 ${maxAttempts - attempts} 次机会）`;
+                resultDiv.style.color = "orange";
             }
-            // ...其他逻辑
+            
+            document.getElementById('guess-input').value = '';
+        }
+
+        function endGame() {
+            document.getElementById('guess-input').disabled = true;
+            document.getElementById('guess-button').disabled = true;
+            document.getElementById('restart-button').style.display = 'inline-block';
+        }
+
+        function restartGame() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            document.getElementById('result').textContent = '';
+            document.getElementById('guess-input').disabled = false;
+            document.getElementById('guess-button').disabled = false;
+            document.getElementById('restart-button').style.display = 'none';
+            document.getElementById('guess-input').focus();
         }
 
         // 新增爱心特效函数
