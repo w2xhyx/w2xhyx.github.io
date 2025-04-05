@@ -1,9 +1,69 @@
 <!DOCTYPE html>
-   <html>
-   <head>
-       <title>My Site</title>
-   </head>
-   <body>
-       <h1>Hello World!</h1>
-   </body>
-   </html>
+<html>
+<head>
+    <title>极简表白墙</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #ffe6f2;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            background: #ff66b3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .message {
+            background: white;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>💖 极简表白墙 💖</h1>
+    
+    <!-- 输入框 -->
+    <textarea id="new-message" placeholder="写下你想说的话..."></textarea>
+    <button onclick="saveMessage()">匿名发布</button>
+    
+    <!-- 消息展示区 -->
+    <div id="messages"></div>
+
+    <script>
+        // 加载已有消息
+        function loadMessages() {
+            const messages = JSON.parse(localStorage.getItem('love-wall') || [];
+            document.getElementById('messages').innerHTML = messages
+                .map(msg => `<div class="message">${msg}</div>`)
+                .join('');
+        }
+
+        // 保存新消息
+        function saveMessage() {
+            const text = document.getElementById('new-message').value.trim();
+            if (!text) return;
+            
+            const messages = JSON.parse(localStorage.getItem('love-wall') || '[]');
+            messages.unshift(text); // 添加到开头
+            localStorage.setItem('love-wall', JSON.stringify(messages));
+            
+            document.getElementById('new-message').value = '';
+            loadMessages(); // 刷新显示
+        }
+
+        // 初始化加载
+        loadMessages();
+    </script>
+</body>
+</html>
