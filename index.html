@@ -189,6 +189,93 @@
             document.getElementById('restart-button').style.display = 'none';
             document.getElementById('guess-input').focus();
         }
+        <!DOCTYPE html>
+<html>
+<head>
+    <title>凌霄的励志空间</title>
+    <style>
+        /* 新增：版权声明样式 */
+        .copyright {
+            position: fixed;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            text-align: center;
+            z-index: 4;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* 新增：励志文案样式 */
+        .motivation-text {
+            position: absolute;
+            color: white;
+            font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            max-width: 300px;
+            text-align: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            transition: opacity 1s ease-in-out;
+            cursor: default;
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <!-- 其他原有内容保持不变 -->
+
+    <!-- 新增版权声明 -->
+    <div class="copyright">作者：凌霄（版权所有，请勿侵权）</div>
+
+    <script>
+        // 新增：励志语录库（可自行扩充）
+        const motivations = [
+            "📚 那些看似不起波澜的日复一日，终会在某天让你看到坚持的意义",
+            "🌟 备考就像黑屋子里洗衣服，天亮后你会感谢每分每秒的认真",
+            "🔥 你背不下来的书总有人能背下来，你愿意拖到明天的事总有人今天做完",
+            "💪 每个优秀的人，都有一段沉默的时光，我们把它叫做扎根",
+            "⏳ 时间从不辜负真诚的付出，你的努力终将绚烂成花",
+            "🌈 当你在夜晚孤军奋战时，漫天星光都因你而闪烁",
+            "🎯 所谓的光辉岁月，并不是后来闪耀的日子，而是无人问津时对梦想的偏执"
+        ];
+
+        // 新增：随机显示励志文案
+        let currentMotivation = null;
+
+        function showRandomMotivation() {
+            // 移除旧文案
+            if (currentMotivation) {
+                currentMotivation.style.opacity = '0';
+                setTimeout(() => currentMotivation.remove(), 1000);
+            }
+
+            // 创建新文案
+            const text = motivations[Math.floor(Math.random() * motivations.length)];
+            const elem = document.createElement('div');
+            elem.className = 'motivation-text';
+            elem.textContent = text;
+            
+            // 随机位置（避开边距）
+            elem.style.left = Math.random() * (window.innerWidth - 300) + 50 + 'px';
+            elem.style.top = Math.random() * (window.innerHeight - 100) + 50 + 'px';
+            elem.style.opacity = '0';
+
+            document.body.appendChild(elem);
+            
+            // 触发淡入效果
+            setTimeout(() => elem.style.opacity = '1', 10);
+            currentMotivation = elem;
+        }
+
+        // 初始显示 + 定时更换（每15秒）
+        showRandomMotivation();
+        setInterval(showRandomMotivation, 15000);
+    </script>
+</body>
+</html>
 
         // 新增爱心特效函数
         function createHearts() {
