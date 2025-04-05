@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>凌霄的励志空间</title>
+    <title>凌霄的空间</title>
     <style>
         /* 全局样式 */
         body {
@@ -9,10 +9,14 @@
             padding: 0;
             height: 100vh;
             font-family: 'Microsoft YaHei', sans-serif;
+            
+            /* 背景图设置（已修复链接） */
             background-image: url('http://img.52desk.com/tp/211924PrUvQ.jpg');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
+            
+            /* 深色半透明遮罩（确保文字可读） */
             position: relative;
             overflow: hidden;
         }
@@ -55,36 +59,44 @@
             text-align: center;
         }
 
-        /* 励志文案样式 */
-        .motivation-text {
-            position: absolute;
+        #game-popup h2 {
+            color: #ff6b6b;
+            margin-top: 0;
+        }
+
+        #guess-input {
+            padding: 8px;
+            width: 100px;
+            margin: 10px 0;
+        }
+
+        #guess-button {
+            background: #ff6b6b;
             color: white;
-            font-size: 16px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-            max-width: 280px;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 8px;
-            transition: all 1s ease;
-            opacity: 0;
-            z-index: 2;
-            line-height: 1.5;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        /* 版权声明 */
-        .copyright {
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: rgba(255,255,255,0.8);
-            font-size: 12px;
-            text-align: center;
-            z-index: 4;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        #result {
+            margin: 15px 0;
+            font-weight: bold;
+            min-height: 20px;
         }
 
-        /* 爱心特效 */
+        #restart-button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+            margin-top: 10px;
+        }
+
+        /* 新增爱心特效样式 */
         .heart {
             position: absolute;
             font-size: 20px;
@@ -95,36 +107,55 @@
         }
 
         @keyframes heartExplode {
-            0% { opacity: 1; transform: translate(0, 0) scale(1); }
-            100% { opacity: 0; transform: translate(var(--x), -100vh) scale(0.5); }
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--x), -100vh) scale(0.5);
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 欢迎语 -->
+    <!-- 左上角欢迎语 -->
     <div id="welcome-text">凌霄，欢迎你的加入！</div>
+    <!-- 版权声明 -->
+<div style="
+    position: fixed;
+    bottom: 10px;
+    width: 100%;
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    font-family: 'Microsoft YaHei';
+    z-index: 999;
+">
+    作者：凌霄（版权所有，请勿侵权）
+</div>
 
     <!-- 猜数字游戏 -->
     <div id="game-popup">
         <h2>猜数字小游戏</h2>
+        <p>我已经想好了一个1-100之间的数字，猜猜看是多少？</p>
         <input type="number" id="guess-input" min="1" max="100" placeholder="输入1-100">
         <button id="guess-button">猜一猜</button>
         <div id="result"></div>
         <button id="restart-button">再玩一次</button>
     </div>
 
-    <!-- 版权声明 -->
-    <div class="copyright">作者：凌霄（版权所有，请勿侵权）</div>
-
     <script>
-        // ========== 游戏逻辑 ==========
+        // 游戏逻辑
         let targetNumber = Math.floor(Math.random() * 100) + 1;
         let attempts = 0;
         const maxAttempts = 7;
 
         document.getElementById('guess-button').addEventListener('click', checkGuess);
         document.getElementById('restart-button').addEventListener('click', restartGame);
-        document.getElementById('guess-input').addEventListener('keypress', e => e.key === 'Enter' && checkGuess());
+        document.getElementById('guess-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkGuess();
+        });
 
         function checkGuess() {
             const guess = parseInt(document.getElementById('guess-input').value);
@@ -139,77 +170,63 @@
             attempts++;
             
             if (guess === targetNumber) {
-                resultDiv.innerHTML = `🎉 恭喜！${attempts}次猜中数字${targetNumber}！`;
+                resultDiv.innerHTML = `🎉 恭喜你！用了 ${attempts} 次猜中了数字 ${targetNumber}！`;
                 resultDiv.style.color = "green";
-                createHearts();
+                createHearts(); // 触发爱心特效
                 endGame();
             } else if (attempts >= maxAttempts) {
-                resultDiv.innerHTML = `😢 正确答案是 ${targetNumber}`;
+                resultDiv.innerHTML = `😢 游戏结束！正确答案是 ${targetNumber}`;
                 resultDiv.style.color = "red";
                 endGame();
             } else {
                 const hint = guess < targetNumber ? "太小了" : "太大了";
-                resultDiv.textContent = `❌ ${hint}（剩余${maxAttempts - attempts}次）`;
+                resultDiv.textContent = `❌ 不对哦！${hint}（还剩 ${maxAttempts - attempts} 次机会）`;
                 resultDiv.style.color = "orange";
             }
             
             document.getElementById('guess-input').value = '';
         }
 
-        // ========== 励志语录 ==========
-        const motivations = [
-            "🌙 深夜的台灯知道你的坚持，晨起的星光见证你的努力",
-            "📖 备考就像在黑屋子里洗衣服，天亮后你会感谢每分每秒的认真",
-            "💪 每个优秀的人，都有一段沉默的时光，叫做扎根",
-            "⏳ 时间从不辜负真诚，你的努力终将绚烂成花",
-            "🎯 所谓光辉岁月，是无人问津时对梦想的偏执",
-            // 此处省略95条，实际使用时请补充完整
-            "🚀 今天的汗水是明天的徽章，坚持就是胜利的序章",
-            "🌈 风雨过后终见彩虹，坚持到底才是英雄"
-        ];
-
-        let currentMotivation = null;
-        function showRandomMotivation() {
-            if (currentMotivation) {
-                currentMotivation.style.opacity = '0';
-                setTimeout(() => currentMotivation.remove(), 1000);
-            }
-
-            const text = motivations[Math.floor(Math.random() * motivations.length)];
-            const elem = document.createElement('div');
-            elem.className = 'motivation-text';
-            elem.textContent = text;
-            
-            elem.style.left = Math.random() * (window.innerWidth - 300) + 50 + 'px';
-            elem.style.top = Math.random() * (window.innerHeight - 100) + 50 + 'px';
-            elem.style.opacity = '0.9';
-            elem.style.transform = `rotate(${Math.random()*4-2}deg)`;
-
-            document.body.appendChild(elem);
-            currentMotivation = elem;
+        function endGame() {
+            document.getElementById('guess-input').disabled = true;
+            document.getElementById('guess-button').disabled = true;
+            document.getElementById('restart-button').style.display = 'inline-block';
         }
 
-        // ========== 特效函数 ==========
+        function restartGame() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            document.getElementById('result').textContent = '';
+            document.getElementById('guess-input').disabled = false;
+            document.getElementById('guess-button').disabled = false;
+            document.getElementById('restart-button').style.display = 'none';
+            document.getElementById('guess-input').focus();
+        }
+
+        // 新增爱心特效函数
         function createHearts() {
             const colors = ['#ff3366', '#ff6b6b', '#ff1493'];
             for (let i = 0; i < 30; i++) {
                 const heart = document.createElement('div');
                 heart.className = 'heart';
                 heart.innerHTML = '❤';
+                
+                // 随机位置和动画参数
                 heart.style.left = Math.random() * 100 + 'vw';
                 heart.style.top = Math.random() * 100 + 'vh';
                 heart.style.setProperty('--x', (Math.random() - 0.5) * 200 + 'px');
                 heart.style.animationDelay = Math.random() * 0.5 + 's';
                 heart.style.fontSize = Math.random() * 20 + 15 + 'px';
                 heart.style.color = colors[Math.floor(Math.random() * colors.length)];
+                
                 document.body.appendChild(heart);
-                heart.addEventListener('animationend', () => heart.remove());
+                
+                // 动画结束后移除元素
+                heart.addEventListener('animationend', () => {
+                    heart.remove();
+                });
             }
         }
-
-        // ========== 初始化 ==========
-        setInterval(showRandomMotivation, 15000); // 每15秒更换语录
-        showRandomMotivation(); // 初始显示
     </script>
 </body>
 </html>
